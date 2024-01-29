@@ -15,16 +15,16 @@ function secondsToMinutesSeconds(seconds) {
 
 async function getSongs(folder) {
     currfolder = folder;
-    let a = await fetch(`https://raw.githubusercontent.com/divyanshgoyal777/spotify/main/${folder}/`);
+    let a = await fetch(`https://raw.githubusercontent.com/divyanshgoyal777/spotify/main/${folder}`);
     let response = await a.text();
-    let div = document.createElement("div")
+    let div = document.createElement("div");
     div.innerHTML = response;
-    let as = div.getElementsByTagName("a")
-    songs = []
+    let as = div.getElementsByTagName("a");
+    songs = [];
     for (let index = 0; index < as.length; index++) {
         const element = as[index];
         if (element.href.endsWith(".mp3")) {
-            songs.push(element.href.split(`/${folder}/`)[1])    //song
+            songs.push(element.href.split(`/${folder}/`)[1]); //song
         }
     }
 
