@@ -16,7 +16,7 @@ function secondsToMinutesSeconds(seconds) {
 async function getSongs(folder) {
      console.log("Fetching songs for folder:", folder);
     currfolder = folder;
-    let a = await fetch(`https://raw.githubusercontent.com/divyanshgoyal777/spotify/main/${folder}/`);
+let a = await fetch(`https://raw.githubusercontent.com/divyanshgoyal777/spotify/main/${folder}/`);
     let response = await a.text();
     let div = document.createElement("div");
     div.innerHTML = response;
@@ -78,7 +78,7 @@ async function displayAlbums() {
 
         if (e.href.includes("/song")) {
 
-            let folder = e.href.split("/").slice(-2)[0]
+let folder = e.href.split("/").slice(-2)[0];
             let a = await fetch(`https://raw.githubusercontent.com/divyanshgoyal777/spotify/main/song/${folder}/info.json`);
             let response = await a.json();
             cardContainer.innerHTML = cardContainer.innerHTML + `<div data-folder="${folder}" class="card">
@@ -97,7 +97,7 @@ async function displayAlbums() {
     }
     Array.from(document.getElementsByClassName("card")).forEach(e => {
         e.addEventListener("click", async item => {
-            songs = await getSongs(`song/${item.currentTarget.dataset.folder}`)
+songs = await getSongs(`song/${item.currentTarget.dataset.folder}`);
             playMusic(songs[0])
         })
     })
