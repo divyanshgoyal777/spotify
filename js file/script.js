@@ -14,6 +14,7 @@ function secondsToMinutesSeconds(seconds) {
 }
 
 async function getSongs(folder) {
+     console.log("Fetching songs for folder:", folder);
     currfolder = folder;
     let a = await fetch(`https://raw.githubusercontent.com/divyanshgoyal777/spotify/main/${folder}/`);
     let response = await a.text();
@@ -49,6 +50,7 @@ async function getSongs(folder) {
             playMusic(e.querySelector(".info").firstElementChild.innerHTML)
         })
     })
+    console.log("Songs fetched:", songs);
 
     return songs
 }
