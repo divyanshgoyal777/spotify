@@ -15,44 +15,52 @@ function secondsToMinutesSeconds(seconds) {
 
 async function getSongs(folder) {
     try {
-        let response = await fetch(`https://api.github.com/repos/divyanshgoyal777/spotify/contents/${folder}`);
-        let data = await response.json();
+        const url = `https://api.github.com/repos/divyanshgoyal777/spotify/contents/${folder}`;
 
-        if (Array.isArray(data) && data.length > 0) {
-            // Filter out non-mp3 files
-            songs = data
-                .filter(file => file.name.endsWith('.mp3'))
-                .map(file => ({
-                    name: file.name,
-                    url: file.download_url
-                }));
+        let response = await fetch(url);
 
-            let songUL = document.querySelector(".songlist").getElementsByTagName("ul")[0];
-            songUL.innerHTML = "";
+        if (response.ok) {
+            let data = await response.json();
 
-            for (const song of songs) {
-                const decodedSong = decodeURIComponent(song.name);
-                songUL.innerHTML += `<li> <img class="invert" src="img/music.svg" alt="music">
-                    <div class="info">
-                        <div>${decodedSong}</div>
-                        <div>Divyansh</div>
-                    </div>
-                    <div class="playnow">
-                        <span>Play Now</span>
-                        <img class="invert" src="img/play.svg" alt="play">
-                    </div></li>`;
-            }
+            if (Array.isArray(data) && data.length > 0) {
+                // Filter out non-mp3 files
+                songs = data
+                    .filter(file => file.name.endsWith('.mp3'))
+                    .map(file => ({
+                        name: file.name,
+                        url: file.download_url
+                    }));
 
-            Array.from(document.querySelector(".songlist").getElementsByTagName("li")).forEach(e => {
-                e.addEventListener("click", element => {
-                    playMusic(song.url);
+                let songUL = document.querySelector(".songlist").getElementsByTagName("ul")[0];
+                songUL.innerHTML = "";
+
+                for (const song of songs) {
+                    const decodedSong = decodeURIComponent(song.name);
+                    songUL.innerHTML += `<li> <img class="invert" src="img/music.svg" alt="music">
+                        <div class="info">
+                            <div>${decodedSong}</div>
+                            <div>Divyansh</div>
+                        </div>
+                        <div class="playnow">
+                            <span>Play Now</span>
+                            <img class="invert" src="img/play.svg" alt="play">
+                        </div></li>`;
+                }
+
+                Array.from(document.querySelector(".songlist").getElementsByTagName("li")).forEach(e => {
+                    e.addEventListener("click", element => {
+                        playMusic(song.url);
+                    });
                 });
-            });
 
-            console.log("Songs fetched:", songs);
-            return songs;
+                console.log("Songs fetched:", songs);
+                return songs;
+            } else {
+                console.error("No valid data received from the GitHub API:", data);
+                return [];
+            }
         } else {
-            console.error("No valid data received from the GitHub API:", data);
+            console.error("Error fetching songs. Response not OK:", response.status);
             return [];
         }
     } catch (error) {
@@ -60,6 +68,7 @@ async function getSongs(folder) {
         return [];
     }
 }
+
 const playMusic = (track, pause = false) => {
     currentsong.src = `/${currfolder}/` + track
     if (!pause) {
