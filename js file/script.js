@@ -16,20 +16,21 @@ function secondsToMinutesSeconds(seconds) {
 async function getSongs(folder) {
     console.log("Fetching songs for folder:", folder);
     currfolder = folder;
-    
+
     try {
-        // Use GitHub API to get repository contents
-        let apiUrl = `https://api.github.com/repos/divyanshgoyal777/spotify/contents/${folder}`;
+        let accessToken = 'YOUR_ACCESS_TOKEN'; // Replace with your GitHub personal access token
+        let apiUrl = `https://api.github.com/repos/divyanshgoyal777/spotify/contents/${folder}?access_token=${accessToken}`;
+
         let response = await fetch(apiUrl);
         let data = await response.json();
-        
+
         songs = data
-            .filter(item => item.name.endsWith('.mp3'))
+            .filter(item => item.type === 'file' && item.name.endsWith('.mp3'))
             .map(item => item.download_url.split(`/${folder}/`)[1]);
-        
+
         let songUL = document.querySelector(".songlist").getElementsByTagName("ul")[0];
         songUL.innerHTML = "";
-        
+
         for (const song of songs) {
             const decodedSong = decodeURIComponent(song);
             songUL.innerHTML += `<li> <img class="invert" src="img/music.svg" alt="music">
