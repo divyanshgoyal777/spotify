@@ -14,46 +14,47 @@ function secondsToMinutesSeconds(seconds) {
 }
 
 async function getSongs(folder) {
-     console.log("Fetching songs for folder:", folder);
+    console.log("Fetching songs for folder:", folder);
     currfolder = folder;
-    //https://github.com/divyanshgoyal777/spotify/tree/main/song
-    let a = await fetch(`https://github.com/divyanshgoyal777/spotify/tree/main/${folder}/`);
-    let response = await a.text();
-    let div = document.createElement("div");
-    div.innerHTML = response;
-    let as = div.getElementsByTagName("a");
-    songs = [];
-    for (let index = 0; index < as.length; index++) {
-        const element = as[index];
-        if (element.href.endsWith(".mp3")) {
-            songs.push(element.href.split(`/${folder}/`)[1]); //song
+    
+    try {
+        // Use GitHub API to get repository contents
+        let apiUrl = `https://api.github.com/repos/divyanshgoyal777/spotify/contents/${folder}`;
+        let response = await fetch(apiUrl);
+        let data = await response.json();
+        
+        songs = data
+            .filter(item => item.name.endsWith('.mp3'))
+            .map(item => item.download_url.split(`/${folder}/`)[1]);
+        
+        let songUL = document.querySelector(".songlist").getElementsByTagName("ul")[0];
+        songUL.innerHTML = "";
+        
+        for (const song of songs) {
+            const decodedSong = decodeURIComponent(song);
+            songUL.innerHTML += `<li> <img class="invert" src="img/music.svg" alt="music">
+                <div class="info">
+                    <div>${decodedSong}</div>
+                    <div>Divyansh</div>
+                </div>
+                <div class="playnow">
+                    <span>Play Now</span>
+                    <img class="invert" src="img/play.svg" alt="play">
+                </div></li>`;
         }
+
+        Array.from(document.querySelector(".songlist").getElementsByTagName("li")).forEach(e => {
+            e.addEventListener("click", element => {
+                playMusic(e.querySelector(".info").firstElementChild.innerHTML);
+            });
+        });
+
+        console.log("Songs fetched:", songs);
+        return songs;
+    } catch (error) {
+        console.error("Error fetching songs:", error);
+        return [];
     }
-
-
-    let songUL = document.querySelector(".songlist").getElementsByTagName("ul")[0]
-    songUL.innerHTML = ""
-    for (const song of songs) {
-        const decodedSong = decodeURIComponent(song);
-        songUL.innerHTML = songUL.innerHTML + `<li> <img class="invert" src="img/music.svg" alt="music">
-                                <div class="info">
-                                    <div>${decodedSong}</div>
-                                    <div>Divyansh</div>
-                                </div>
-                                <div class="playnow">
-                                    <span>Play Now</span>
-                                    <img class="invert" src="img/play.svg" alt="play">
-                                </div></li>`;
-    }
-
-    Array.from(document.querySelector(".songlist").getElementsByTagName("li")).forEach(e => {
-        e.addEventListener("click", element => {
-            playMusic(e.querySelector(".info").firstElementChild.innerHTML)
-        })
-    })
-    console.log("Songs fetched:", songs);
-
-    return songs
 }
 
 const playMusic = (track, pause = false) => {
